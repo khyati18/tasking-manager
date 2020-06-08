@@ -1,7 +1,7 @@
 from flask import current_app
 from sqlalchemy import and_
 
-from backend import db
+from backend import create_app, db
 from backend.models.dtos.team_dto import (
     TeamDTO,
     NewTeamDTO,
@@ -12,6 +12,8 @@ from backend.models.dtos.team_dto import (
     TeamDetailsDTO,
 )
 from backend.models.dtos.organisation_dto import OrganisationProjectsDTO
+from backend.models.dtos.message_dto import MessageDTO
+from backend.models.postgis.message import Message, MessageType
 from backend.models.postgis.team import Team, TeamMembers
 from backend.models.postgis.project import ProjectTeams
 from backend.models.postgis.project_info import ProjectInfo
@@ -546,3 +548,26 @@ class TeamService:
             if TeamService.is_user_an_active_team_member(team_dto.team_id, user_id)
         ]
         return len(user_membership) > 0
+
+    @staticmethod
+    def send_message_to_all_team_members(team_id: int, message_dto: MessageDTO):
+        """  Sends supplied message to all contributors in a team.  Message all team members can take
+             over a minute to run, so this method is expected to be called on its own thread """
+        print(team_id, message_dto)
+        app = (
+            create_app()
+        )  # Because message-all run on background thread it needs it's own app context
+
+        with app.app_context():
+            team_members = TeamService._get_team_members(team_id)
+
+            messages = []
+            for team_member in team_members:
+                print(team_member)
+                message = Message.from_dto(team_member.user_id, message_dto)
+                message.message_type = MessageType.BROADCAST.value
+                message.save()
+                user = UserService.get_user_by_id(team_member.user_id)
+                messages.append(dict(message=message, user=user))
+
+            MessageService._push_messages(messages)
