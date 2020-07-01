@@ -239,7 +239,6 @@ class TeamsActionsLeaveAPI(Resource):
 
 
 class TeamsActionsMessageMembersAPI(Resource):
-    @tm.pm_only(True)
     @token_auth.login_required
     def post(self, team_id):
         """
@@ -288,12 +287,20 @@ class TeamsActionsMessageMembersAPI(Resource):
         """
         try:
             authenticated_user_id = token_auth.current_user()
+            team_id = request.view_args["team_id"]
             message_dto = MessageDTO(request.get_json())
+            is_manager = TeamService.is_user_team_manager(
+                team_id, authenticated_user_id
+            )
+            if not is_manager:
+                raise ValueError
             message_dto.from_user_id = authenticated_user_id
             message_dto.validate()
         except DataError as e:
             current_app.logger.error(f"Error validating request: {str(e)}")
             return {"Error": "Unable to send message to team members"}, 400
+        except ValueError:
+            return {"Error": "Unauthorised to send message to team members"}, 403
 
         try:
             threading.Thread(
