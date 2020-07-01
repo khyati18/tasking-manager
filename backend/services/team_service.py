@@ -567,7 +567,7 @@ class TeamService:
             messages = []
             for team_member in team_members:
                 message = Message.from_dto(team_member.user_id, message_dto)
-                message.message_type = MessageType.BROADCAST.value
+                message.message_type = MessageType.TEAM_BROADCAST.value
                 message.save()
                 user = UserService.get_user_by_id(team_member.user_id)
                 messages.append(dict(message=message, user=user))
