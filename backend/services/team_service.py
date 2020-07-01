@@ -474,6 +474,10 @@ class TeamService:
         return TeamMembers.query.filter_by(team_id=team_id).all()
 
     @staticmethod
+    def _get_active_team_members(team_id: int):
+        return TeamMembers.query.filter_by(team_id=team_id, active=True).all()
+
+    @staticmethod
     def activate_team_member(team_id: int, user_id: int):
         member = TeamMembers.query.filter(
             TeamMembers.team_id == team_id, TeamMembers.user_id == user_id
@@ -553,17 +557,15 @@ class TeamService:
     def send_message_to_all_team_members(team_id: int, message_dto: MessageDTO):
         """  Sends supplied message to all contributors in a team.  Message all team members can take
              over a minute to run, so this method is expected to be called on its own thread """
-        print(team_id, message_dto)
         app = (
             create_app()
         )  # Because message-all run on background thread it needs it's own app context
 
         with app.app_context():
-            team_members = TeamService._get_team_members(team_id)
+            team_members = TeamService._get_active_team_members(team_id)
 
             messages = []
             for team_member in team_members:
-                print(team_member)
                 message = Message.from_dto(team_member.user_id, message_dto)
                 message.message_type = MessageType.BROADCAST.value
                 message.save()
