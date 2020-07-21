@@ -14,6 +14,7 @@ from backend.models.postgis.message import Message, MessageType, NotFound
 from backend.models.postgis.notification import Notification
 from backend.models.postgis.project import Project
 from backend.models.postgis.task import TaskStatus, TaskAction, TaskHistory
+from backend.models.postgis.statuses import TeamRoles, TeamMemberFunctions
 from backend.services.messaging.smtp_service import SMTPService
 from backend.services.messaging.template_service import get_template, get_profile_url
 from backend.services.users.user_service import UserService, User
@@ -148,7 +149,7 @@ class MessageService:
         comment_from: int, comment: str, task_id: int, project_id: int
     ):
         """ Will send a canned message to anyone @'d in a comment """
-        usernames = MessageService._parse_message_for_username(comment)
+        usernames = MessageService._parse_message_for_username(comment, project_id)
         if len(usernames) != 0:
             task_link = MessageService.get_task_link(project_id, task_id)
 
@@ -323,7 +324,7 @@ class MessageService:
     def send_message_after_chat(chat_from: int, chat: str, project_id: int):
         """ Send alert to user if they were @'d in a chat message """
         current_app.logger.debug("Sending Message After Chat")
-        usernames = MessageService._parse_message_for_username(chat)
+        usernames = MessageService._parse_message_for_username(chat, project_id)
 
         if len(usernames) == 0:
             return  # Nobody @'d so return
@@ -450,7 +451,44 @@ class MessageService:
         SMTPService.send_verification_email(user.email_address, user.username)
 
     @staticmethod
-    def _parse_message_for_username(message: str) -> List[str]:
+    def _get_managers(message: str, project_id: int) -> List[str]:
+        parser = re.compile(r"((?<=#)\w+|\[.+?\])")
+        parsed = parser.findall(message)
+
+        prj = None
+        if "author" in parsed or "managers" in parsed:
+            prj = Project.query.get(project_id)
+
+        if prj is None:
+            return []
+
+        prj_usernames = [prj.author.username]
+
+        if "managers" not in parsed:
+            return prj_usernames
+
+        teams = [t for t in prj.teams if t.role == TeamRoles.PROJECT_MANAGER.value]
+        team_members = [
+            [
+                u.member.username
+                for u in t.team.members
+                if u.function == TeamMemberFunctions.MANAGER.value
+            ]
+            for t in teams
+        ]
+
+        team_members = [item for sublist in team_members for item in sublist]
+        prj_usernames.extend(team_members)
+
+        # Add organization managers.
+        if prj.organisation is not None:
+            org_usernames = [u.username for u in prj.organisation.managers]
+            prj_usernames.extend(org_usernames)
+
+        return prj_usernames
+
+    @staticmethod
+    def _parse_message_for_username(message: str, project_id: int) -> List[str]:
         """ Extracts all usernames from a comment looks for format @[user name] """
 
         parser = re.compile(r"((?<=@)\w+|\[.+?\])")
@@ -462,6 +500,9 @@ class MessageService:
             username = username.replace("]", "", index)
             usernames.append(username)
 
+        usernames.extend(MessageService._get_managers(message, project_id))
+
+        usernames = list(set(usernames))
         return usernames
 
     @staticmethod
