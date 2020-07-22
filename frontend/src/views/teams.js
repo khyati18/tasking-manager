@@ -107,6 +107,14 @@ const leaveTeamRequest = (team_id, username, role, token) => {
     'POST',
   );
 };
+const sendTeamMessage = (team_id, subject, message, token) => {
+  pushToLocalJSONAPI(
+    `teams/${team_id}/actions/message-members/`,
+    JSON.stringify({ message: message, subject: subject }),
+    token,
+    'POST',
+  );
+};
 
 export function CreateTeam() {
   useSetTitleTag('Create new team');
