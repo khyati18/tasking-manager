@@ -28,6 +28,10 @@ export default defineMessages({
     id: 'notifications.filter.projects',
     defaultMessage: 'Projects',
   },
+  delete_selected: {
+    id: 'notifications.filter.delete_selected',
+    defaultMessage: 'Delete Selected',
+  },
   clearFilters: {
     id: 'notifications.filter.clear',
     defaultMessage: 'Clear filters',

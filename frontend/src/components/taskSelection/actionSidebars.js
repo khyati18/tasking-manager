@@ -265,6 +265,7 @@ export function CompletionTabForValidation({
           {(close) => <UnsavedMapChangesModalContent close={close} action={showMapChangesModal} />}
         </Popup>
       )}
+      <div className="bb b--grey-light w-100"></div>
       <div className="cf">
         {taskInstructions && (
           <TaskSpecificInstructions instructions={taskInstructions} open={false} />
@@ -432,8 +433,8 @@ function UnsavedMapChangesModalContent({ close, action }: Object) {
 function TaskSpecificInstructions({ instructions, open = true }: Object) {
   const [isOpen, setIsOpen] = useState(open);
   return (
-    <>
-      <h4 className="ttu blue-grey mt1 mb0 pointer" onClick={() => setIsOpen(!isOpen)}>
+    <div className="">
+      <h4 className="ttu blue-grey mb0 pointer" onClick={() => setIsOpen(!isOpen)}>
         {isOpen ? (
           <ChevronDownIcon style={{ height: '14px' }} className="pr1 pb1 v-mid" />
         ) : (
@@ -447,6 +448,6 @@ function TaskSpecificInstructions({ instructions, open = true }: Object) {
           dangerouslySetInnerHTML={htmlFromMarkdown(instructions)}
         />
       )}
-    </>
+    </div>
   );
 }

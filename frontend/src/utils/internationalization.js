@@ -5,7 +5,6 @@ import { IntlProvider } from 'react-intl';
 import ar from '../locales/ar.json';
 import cs from '../locales/cs.json';
 import de from '../locales/de.json';
-import el from '../locales/el.json';
 import en from '../locales/en.json';
 import es from '../locales/es.json';
 import fa_IR from '../locales/fa_IR.json';
@@ -20,7 +19,6 @@ import ml from '../locales/ml.json';
 import nl_NL from '../locales/nl_NL.json';
 import pt from '../locales/pt.json';
 import pt_BR from '../locales/pt_BR.json';
-import ru from '../locales/ru.json';
 import sv from '../locales/sv.json';
 import sw from '../locales/sw.json';
 import tl from '../locales/tl.json';
@@ -31,23 +29,13 @@ import zh_TW from '../locales/zh_TW.json';
 import { setLocale } from '../store/actions/userPreferences';
 import * as config from '../config';
 
-/* Safari 12- and IE */
-if (!Intl.PluralRules) {
-  require('@formatjs/intl-pluralrules/polyfill-locales');
-}
-/* Safari 13- and IE */
-if (!Intl.RelativeTimeFormat) {
-  require('@formatjs/intl-relativetimeformat/polyfill-locales');
-}
-
 const translatedMessages = {
   ar: ar,
   cs: cs,
   de: de,
-  el: el,
   en: en,
   es: es,
-  'fa-IR': fa_IR,
+  fa: fa_IR,
   fr: fr,
   he: he,
   hu: hu,
@@ -59,7 +47,6 @@ const translatedMessages = {
   nl: nl_NL,
   pt: pt,
   'pt-BR': pt_BR,
-  ru: ru,
   sv: sv,
   sw: sw,
   tl: tl,
@@ -68,15 +55,23 @@ const translatedMessages = {
   zh: zh_TW,
 };
 
-// commented values doesn't have a good amount of strings translated
+/* Safari 12- and IE */
+if (!Intl.PluralRules) {
+  require('@formatjs/intl-pluralrules/polyfill-locales');
+}
+/* Safari 13- and IE */
+if (!Intl.RelativeTimeFormat) {
+  require('@formatjs/intl-relativetimeformat/polyfill-locales');
+}
+
+// commented out the languages that we are not supporting on the first production release of TM4
 const supportedLocales = [
   // { value: 'ar', label: 'عربى' },
   { value: 'cs', label: 'Česky' },
   { value: 'de', label: 'Deutsch' },
-  { value: 'el', label: 'Ελληνικά' },
   { value: 'en', label: 'English' },
   { value: 'es', label: 'Español' },
-  { value: 'fa-IR', label: 'فارسی' },
+  // { value: 'fa-IR', label: 'فارسی' },
   { value: 'fr', label: 'Français' },
   { value: 'he', label: 'עברית' },
   { value: 'hu', label: 'Magyar' },
@@ -88,7 +83,6 @@ const supportedLocales = [
   { value: 'nl', label: 'Nederlands' },
   { value: 'pt', label: 'Português' },
   { value: 'pt-BR', label: 'Português (Brasil)' },
-  // { value: 'ru', label: 'Русский язык' },
   { value: 'sv', label: 'Svenska' },
   { value: 'sw', label: 'Kiswahili' },
   // { value: 'tl', label: 'Filipino (Tagalog)' },

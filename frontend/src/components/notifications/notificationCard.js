@@ -14,6 +14,8 @@ import { RelativeTimeWithUnit } from '../../utils/formattedRelativeTime';
 import { fetchLocalJSONAPI } from '../../network/genericJSONRequest';
 import { navigate, useLocation } from '@reach/router';
 
+import Checkbox from './checkbox'
+
 export const rawHtmlNotification = (notificationHtml) => ({
   __html: DOMPurify.sanitize(notificationHtml),
 });
@@ -74,11 +76,15 @@ export function NotificationCard({
   const Navigate = () => navigate(`/inbox/message/${messageId}/${location.search}`);
 
   return (
+
     <article
       onClick={Navigate}
       className={`pointer db base-font bg-white w-100 mb1 blue-dark mw8 ${readStyle}`}
     >
       <div className="pv3 pr3 ba br1 b--grey-light">
+        <div className="fl dib mh3">
+          <Checkbox />
+        </div>
         <div className={`fl dib w2 h3 mh3`}>
           <MessageAvatar messageType={messageType} fromUsername={fromUsername} size={'medium'} />
         </div>

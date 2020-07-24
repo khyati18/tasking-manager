@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from '@reach/router';
 import Select from 'react-select';
 import ReactPlaceholder from 'react-placeholder';
 import { FormattedMessage, injectIntl, useIntl } from 'react-intl';
@@ -7,18 +6,9 @@ import { FormattedMessage, injectIntl, useIntl } from 'react-intl';
 import messages from './messages.js';
 import { UserAvatar } from '../user/avatar';
 import { CheckCircle } from '../checkCircle';
-import { CustomButton } from '../button';
-import {
-  MappedIcon,
-  ValidatedIcon,
-  AsteriskIcon,
-  HalfStarIcon,
-  FullStarIcon,
-  ChartLineIcon,
-} from '../svgIcons';
+import { MappedIcon, ValidatedIcon, AsteriskIcon, HalfStarIcon, FullStarIcon } from '../svgIcons';
 import ProjectProgressBar from '../projectCard/projectProgressBar';
 import { useComputeCompleteness } from '../../hooks/UseProjectCompletenessCalc';
-import { getPastMonths } from '../../utils/date';
 import { OSMChaButton } from '../projectDetail/osmchaButton';
 
 export const MappingLevelIcon = ({ mappingLevel }) => {
@@ -136,7 +126,8 @@ const Contributions = (props) => {
   };
 
   if (level.value === 'NEWUSER') {
-    const monthFiltered = getPastMonths(1);
+    const monthFiltered = new Date();
+    monthFiltered.setMonth(monthFiltered.getMonth() - 1);
     contributionsArray = contributionsArray
       .map((u) => {
         return { ...u, dateObj: new Date(u.dateRegistered) };
@@ -153,18 +144,7 @@ const Contributions = (props) => {
           percentBadImagery={percentBadImagery}
           className="pt1 pb3"
         />
-        <Link to={`/projects/${props.project.projectId}/stats/`}>
-          <CustomButton className="bg-white blue-light bn">
-            <FormattedMessage {...messages.statistics} />
-            <ChartLineIcon className="pl1 pb1 h1 v-mid" />
-          </CustomButton>
-        </Link>
-        <span className="blue-light f4 fw7 ph1">&#183;</span>
-        <OSMChaButton
-          project={props.project}
-          className="bg-white blue-light bn mv2"
-          compact={true}
-        />
+        <OSMChaButton project={props.project} className="bg-white blue-light bn mv2" />
         <Select
           classNamePrefix="react-select"
           isClearable={false}

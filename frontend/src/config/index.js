@@ -1,8 +1,9 @@
 // API ENDPOINTS
 export const API_VERSION = process.env.REACT_APP_API_VERSION || 'v2';
-export const API_URL = process.env.REACT_APP_API_URL
-  ? new URL('/api/' + API_VERSION + '/', process.env.REACT_APP_API_URL)
-  : 'http://127.0.0.1:5000/api/' + API_VERSION + '/';
+export const API_URL = "https://tasking-manager-staging-api.hotosm.org/api/v2/";
+// export const API_URL = process.env.REACT_APP_API_URL
+//   ? new URL('/api/' + API_VERSION + '/', process.env.REACT_APP_API_URL)
+//   : 'http://127.0.0.1:5000/api/' + API_VERSION + '/';
 export const HOMEPAGE_STATS_API_URL =
   process.env.REACT_APP_HOMEPAGE_STATS_API_URL ||
   'https://osmstats-api.hotosm.org/wildcard/?key=hotosm-project-*';
